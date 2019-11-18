@@ -1,26 +1,21 @@
-/**
- * Created by User on 15.11.2019.
- */
-
 @IsTest
 private class AppointmentTriggerHandlerTest {
 
     @isTest
     private static void relateToAccountTest() {
         getAccounts();
-        List<Appointment__c> appointments = getAppointments();
 
         Test.startTest();
         AppointmentTriggerHandler appointmentTriggerHandler = new AppointmentTriggerHandler();
-        appointmentTriggerHandler.relateToAccount(appointments);
+        appointmentTriggerHandler.relateToAccount(getAppointments());
         Test.stopTest();
 
-        List<Account> accounts = [SELECT Name, Appointment__c FROM Account WHERE Name =: 'Maggy'];
-        System.assertNotEquals(accounts.size(), 0);
-        System.assertEquals(accounts.get(0).Name, 'Maggy');
-        Account account = [SELECT Name, Appointment__c FROM Account WHERE Name =: 'Bob'];
-        Id appointmentId = appointments.get(0).Id;
-        System.assertEquals(account.Appointment__c, appointmentId);
+        List<Appointment__c> appointments = [SELECT Id, Name, Account__c FROM Appointment__c];
+        Account accountBob = [SELECT Name, Appointment__c FROM Account WHERE Name =: 'Bob'];
+        System.assertEquals(appointments.get(0).Account__c, accountBob.Id);
+        Account accountMaggy = [SELECT Name, Appointment__c FROM Account WHERE Name =: 'Maggy'];
+        System.assertEquals(accountMaggy.Name, 'Maggy');
+        System.assertEquals(appointments.get(1).Account__c, accountMaggy.Id);
     }
 
     private static List<Appointment__c> getAppointments(){

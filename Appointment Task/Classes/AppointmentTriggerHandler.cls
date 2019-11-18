@@ -1,20 +1,35 @@
-/**
- * Created by User on 15.11.2019.
- */
+public class AppointmentTriggerHandler {
 
-public with sharing class AppointmentTriggerHandler {
+    public void relateToAccount(List<Appointment__c> appointments) {
+        List<String> namesOfAccounts = new List<String>();
+        for (Appointment__c appointment : appointments) {
+            namesOfAccounts.add(appointment.Account_Name__c);
+        }
+        List<Account> accounts = AppointmentManager.getAccountsFromListOfNames(namesOfAccounts);
+        List<Account> newAccounts = new List<Account>();
 
-    public void relateToAccount(List<Appointment__c> appointments){
-
-        for(Appointment__c appointment : appointments){
-            Account account = AppointmentManager.getAccountByName(appointment.Account_Name__c);
-            if(account != null){
-                account.Appointment__c = appointment.Id;
-                update account;
+        Boolean isEquals = false;
+        for (Appointment__c appointment : appointments) {
+            for(Account account : accounts){
+                if(appointment.Account_Name__c.equals(account.Name)){
+                    appointment.Account__c = account.Id;
+                    isEquals = true;
+                    break;
+                }
             }
-            else{
-                Account newAccount = new Account(Name = appointment.Account_Name__c, Appointment__c = appointment.Id);
-                insert newAccount;
+            if(isEquals == false){
+                newAccounts.add(new Account(Name = appointment.Account_Name__c));
+            }
+            isEquals = false;
+        }
+
+        insert newAccounts;
+
+        Integer i = 0;
+        for(Appointment__c appointment : appointments){
+            if(appointment.Account__c == null){
+                appointment.Account__c = newAccounts.get(i).Id;
+                i++;
             }
         }
     }

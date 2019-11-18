@@ -1,12 +1,14 @@
-/**
- * Created by User on 15.11.2019.
- */
-
-public with sharing class AppointmentManager {
-    public static Account getAccountByName(String name){
-        List<Account> accounts = [SELECT Id, Name FROM Account WHERE Name =: name LIMIT 1];
-        if(accounts.size() > 0){
-            return accounts.get(0);
+public class AppointmentManager {
+    public static List<Account> getAccountsFromListOfNames(List<String> namesOfAccounts) {
+        Boolean isValidNames = true;
+        for(String name : namesOfAccounts){
+            if(name == null || name == ''){
+                isValidNames = false;
+                break;
+            }
+        }
+        if(isValidNames){
+            return [SELECT Id, Name FROM Account WHERE Name IN : namesOfAccounts];
         }
         else{
             return null;
